@@ -1,0 +1,130 @@
+#include<iostream>
+#include<GL/glut.h>
+using namespace std;
+//int xmin, ymin, xmax, ymax;
+int v;
+int x , y ;
+float fillcolor[3];
+float bcolor[3];
+int input[2][20];
+int Round(float a){
+ return (a + 0.5);
+}
+void drawLine(int x1, int y1, int x2, int y2) {
+ glBegin(GL_POINTS);
+ int dx = x2 - x1;
+ int dy = y2 - y1;
+ int steps = abs(dx) > abs(dy) ? abs(dx) : abs(dy);
+ float xinc = (float)dx / steps;
+ float yinc = (float)dy / steps;
+ float x = x1;
+ float y = y1;
+ glVertex2d(Round(x), Round(y));
+
+ for(int i = 0; i < steps; i++) {
+ x += xinc;
+ y += yinc;
+ glVertex2d(Round(x), Round(y));
+ }
+ glEnd();
+}
+ void boundry_fill(int x,int y , float *fillcolor , float *bcolor)
+ {
+ float color[3];
+ glReadPixels(x,y,1.0,1.0,GL_RGB,GL_FLOAT,color); //finding color
+most imp external can ask, seq must be same , and 1.0 is width and
+height,float is return type and at last variable
+ if((color[0] !=bcolor[0]||color[1] !=bcolor[1]||color[2]
+!=bcolor[2]) && (color[0] !=fillcolor[0]||color[1]
+!=fillcolor[1]||color[2] !=fillcolor[2]) )
+ {
+ glColor3f(fillcolor[0],fillcolor[1],fillcolor[2]);
+//filling of color
+
+ glBegin(GL_POINTS);
+ glVertex2i(x,y);
+ glEnd();
+ glFlush();
+ boundry_fill(x+1,y,fillcolor,bcolor); //recursion
+ boundry_fill(x-1,y,fillcolor,bcolor);
+ boundry_fill(x,y+1,fillcolor,bcolor);
+ boundry_fill(x,y-1,fillcolor,bcolor);
+ }
+ }
+// void Draw()
+// {
+// glClear(GL_COLOR_BUFFER_BIT);
+// // Draw window
+// glColor3f(0,0,1);
+// glBegin(GL_LINE_LOOP);
+// // glVertex2i(xmin,ymin);
+// // glVertex2i(xmax,ymin);
+// // glVertex2i(xmax,ymax);
+// // glVertex2i(xmin,ymax);
+// glEnd();
+// // Draw polygon
+// glColor3f(1,0,0);
+// for(int i=0; i<v; i++) {
+// drawLine(input[0][i], input[1][i], input[0][(i+1)%v],
+input[1][(i+1)%v]);
+// }
+// glFlush();
+// }
+void display()
+{
+ glClear(GL_COLOR_BUFFER_BIT);
+ glColor3f(0,0,1);
+ glBegin(GL_LINE_LOOP);
+ // glVertex2i(xmin,ymin);
+ // glVertex2i(xmax,ymin);
+ // glVertex2i(xmax,ymax);
+ // glVertex2i(xmin,ymax);
+ glEnd();
+ glColor3f(bcolor[0],bcolor[1],bcolor[2]);
+ glBegin(GL_LINE_LOOP);
+ for(int i=0;i<v;i++)
+ glVertex2i(input[0][i],input[1][i]);
+ glEnd();
+ boundry_fill(x,y,fillcolor,bcolor);
+ glFlush();
+}
+int main(int argc, char** argv)
+{
+ // cout<<"Enter values of window (xmin ymin xmax ymax): ";
+ // cin>>xmin>>ymin>>xmax>>ymax;
+ cout<<"Enter the polygon color:"<<endl;
+ for(int i = 0 ; i < 3 ; i++)
+ {
+ cout<<"enter floating val :";
+ cin>>bcolor[i];
+ }
+ cout<<endl;
+ cout<<"Enter the pixel(x,y) which is inside polygon"<<endl;
+ cin>>x>>y;
+
+ cout<<"Enter the filling color in floating:"<<endl;
+ for(int i=0 ; i < 3 ; i++)
+ {
+ cout<<"Enter the color";
+ cin>>fillcolor[i];
+ }
+ cout<<"Vertices: ";
+ cin>>v;
+ for(int i=0;i<v;i++)
+ {
+ cout<<"Enter x and y: ";
+ cin>>input[0][i]>>input[1][i];
+ }
+
+ glutInit(&argc,argv);
+ glutInitDisplayMode(GLUT_SINGLE|GLUT_RGB);
+ glutInitWindowSize(600,600);
+ glutCreateWindow("Polygon Filling");
+ glClearColor(1,1,1,1); //set the background color which has 4 param
+ glMatrixMode(GL_PROJECTION);
+ glLoadIdentity();
+ gluOrtho2D(0,600,0,600);
+ glutDisplayFunc(display);
+ glutMainLoop();
+ return 0;
+} 
