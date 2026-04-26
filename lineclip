@@ -1,0 +1,230 @@
+#include<iostream>
+#include<GL/glut.h>
+
+using namespace std;
+
+int xmin , ymin , xmax , ymax , xa ,
+ya , xb , yb ; int outCode1[4] =
+{0,0,0,0}; int outCode2[4] =
+{0,0,0,0};
+
+int Round(float a)
+{ return
+(int)(a+0.5);
+} void dda(int xi ,
+int yi , int xj , int
+yj)
+{ int dx
+= xj - xi;
+int dy = yj -
+yi; int
+steps;
+
+ if (abs(dx) > abs(dy))
+ {
+ steps = abs(dx);
+ }
+else
+ {
+ steps = abs(dy);
+ }
+
+ float xinc = (float)dx / steps;
+float yinc = (float)dy / steps;
+ float x = xi, y =
+yi;
+
+ glVertex2d(xi, yi);
+
+ for(int i = 0; i < steps; i++)
+ { x = x + xinc;
+y = y + yinc;
+glVertex2d(Round(x),
+Round(y)); }
+}
+
+void calculateOutcode(int x , int y , int
+outcode[])
+{ for(int i =
+0; i < 4; i++)
+outcode[i] = 0;
+
+ if(y > ymax)
+outcode[0] = 1;
+ if(y
+< ymin)
+outcode[1]
+= 1;
+
+ if(x > xmax)
+outcode[2] = 1;
+ if(x
+< xmin)
+outcode[3]
+= 1;
+}
+
+void lineClipping()
+{
+ calculateOutcode(xa, ya, outCode1);
+calculateOutcode(xb, yb, outCode2);
+
+ int flag1 = 0,
+flag2 = 0;
+for(int i = 0; i <
+4; i++)
+ {
+if(outCode1[i] ==
+1)
+flag1 = 1;
+
+ if(outCode2[i] ==
+1) flag2 = 1;
+ }
+
+ if(flag1 == 0 && flag2 == 0)
+ {
+ cout << "Completely
+Accepted\n"; return;
+ }
+
+ int flag3 =
+0; for(int
+i = 0; i < 4;
+i++)
+ {
+ if(outCode1[i] == 1 && outCode2[i]
+== 1)
+ {
+flag3 = 1;
+break;
+ }
+ }
+
+ if(flag3 == 1)
+ {
+ cout << "Completely
+Rejected\n"; return;
+ }
+
+ cout << "Partially Accepted\n";
+
+ float m = (float)(yb - ya) / (xb - xa);
+
+ int x1 = xa, y1
+= ya; int x2 =
+xb, y2 = yb;
+
+ if(outCode1[3] == 1)
+ {
+ x1 = xmin;
+y1 = ya + m * (xmin -
+xa);
+ }
+ else if(outCode1[2] == 1)
+ {
+ x1 = xmax;
+y1 = ya + m * (xmax -
+xa);
+ }
+ else if(outCode1[1] == 1)
+ {
+ y1 = ymin;
+x1 = xa + (ymin - ya)
+/ m;
+ }
+ else if(outCode1[0] == 1)
+ {
+ y1 = ymax;
+x1 = xa + (ymax - ya)
+/ m;
+ }
+
+ if(outCode2[3] == 1)
+ {
+ x2 = xmin;
+y2 = yb + m * (xmin -
+xb);
+ }
+ else if(outCode2[2] == 1)
+ {
+ x2 = xmax;
+y2 = yb + m * (xmax -
+xb);
+ }
+ else if(outCode2[1] == 1)
+ {
+ y2 = ymin;
+x2 = xb + (ymin - yb)
+/ m;
+ }
+ else if(outCode2[0] == 1)
+ {
+ y2 = ymax;
+x2 = xb + (ymax - yb)
+/ m;
+ }
+
+ glColor3f(1.0, 0.0,
+0.0);
+glBegin(GL_POINTS);
+dda(x1, y1, x2, y2);
+glEnd();
+
+ glColor3f(0.0, 0.0, 0.0);
+}
+
+void Draw()
+{
+ glClear(GL_COLOR_BUFFER_BIT);
+
+ glBegin(GL_POINTS);
+dda(xmin, ymin, xmax,
+ymin); dda(xmax, ymin,
+xmax, ymax); dda(xmax,
+ymax, xmin, ymax);
+dda(xmin, ymax, xmin,
+ymin); glEnd();
+
+ glBegin(GL_POINTS);
+dda(xa, ya, xb, yb);
+glEnd();
+
+ lineClipping();
+
+ glFlush();
+}
+
+int main(int argc, char** argv)
+{
+ cout << "Enter Window
+Start: "; cin >> xmin >>
+ymin;
+
+ cout << "Enter Window
+End: "; cin >> xmax >>
+ymax;
+
+ cout << "Enter Line
+Start: "; cin >> xa >>
+ya;
+
+ cout << "Enter Line
+End: "; cin >> xb >>
+yb;
+
+ glutInit(&argc, argv);
+glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
+glutInitWindowSize(640, 480);
+glutCreateWindow("Line
+Clipping");
+
+ glClearColor(1,1,1,0);
+glColor3f(0,0,0);
+gluOrtho2D(0,640,0,480);
+
+ glutDisplayFunc(Draw);
+glutMainLoop();
+
+ return 0;
+}
