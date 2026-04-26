@@ -1,0 +1,74 @@
+#include <iostream>
+#include <GL/glut.h>
+using namespace std;
+int xc,yc,r;
+void Brescircle(int r, int xc, int yc)
+{
+
+ int x,y,d;
+ x=0;
+y=r;
+ d=3-(2*r);
+ glClear(GL_COLOR_BUFFER_BIT);
+glBegin(GL_POINTS);
+
+ do{
+
+ glVertex2d(xc+x,yc+y);
+glVertex2d(xc+y,yc+x);
+ glVertex2d(xc+y,yc-x);
+ glVertex2d(xc+x,yc-y);
+ glVertex2d(xc-x,yc-y);
+ glVertex2d(xc-y,yc-x);
+ glVertex2d(xc-y,yc+x);
+ glVertex2d(xc-x,yc+y);
+
+ if(d<0){
+ x=x+1;
+ d=d+4*x+6;
+ }
+ else{
+ x=x+1;
+ y=y-1;
+ d=d+4*x-4*y+10;
+ }
+ }while(x<=y);
+ glEnd();
+glFlush();
+
+}
+void Draw()
+{
+/*glClear(GL_COLOR_BUFFER_BIT);
+glBegin(GL_LINES);
+glVertex2d(100,100);
+glVertex2d(300,300); glEnd();
+glFlush();*/
+Brescircle(r,xc,yc);
+}
+
+int main(int argc,char **argv)
+{
+ cout<<"\nX coordinate of centre: ";
+ cin>>xc;
+ cout<<"\nY coordinate of centre: ";
+ cin>>yc;
+ cout<<"\nRadius of circle: ";
+ cin>>r;
+ glutInit(&argc,argv); //initialize
+GLUT(Graphics Library Utility Tool) library
+ glutInitDisplayMode(GLUT_SINGLE|GLUT_RGB); //sets the initial
+display mode
+ glutInitWindowPosition(0,0);
+ glutInitWindowSize(640,480); //set the initial window
+position and size
+ glutCreateWindow("Plot"); //create the window with
+title plot
+ glClearColor(1.0,1.0,1.0,0); //set clear/background
+colour white
+ glColor3f(0.0,0.0,0.0); //set fill colour to
+black gluOrtho2D(0,640,0,480);
+glutDisplayFunc(Draw); //call the display function
+ glutMainLoop(); //keep displaying
+until the program is closed return 0;
+}
