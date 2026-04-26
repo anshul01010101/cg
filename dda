@@ -1,0 +1,61 @@
+//Problem Statement: Write a program to draw a line using DDA line drawing algorithms.
+#include <GL/glut.h>
+#include <iostream>
+using namespace std;
+int x0,x1,ya,yb;
+int round(float a)
+{
+ return (a+0.5);
+}
+void DDA()
+{
+ glClear(GL_COLOR_BUFFER_BIT);
+ glBegin(GL_POINTS);
+ int dx= x1-x0;
+ int dy= yb-ya;
+ int step;
+ if (abs(dx)>abs(dy))
+ {
+ step=abs(dx);
+ }
+ else
+ {
+ step=abs(dy);
+ }
+ float xincr = (float)dx / step;
+ float yincr = (float)dy / step;
+
+ float x=x0;
+ float y=ya;
+ glVertex2d(round(x), round(y));
+
+ for (int i=0;i<step;i++)
+ {
+ x=x+xincr;
+ y=y+yincr;
+ glVertex2d(round(x), round(y));
+ }
+ glEnd();
+ glFlush();
+ }
+
+int main(int argc,char **argv)
+{
+ cout<<"\nEnter Coordinates of first point"<<endl;
+ cin>>x0>>ya;
+ cout<<"\nEnter Coordinates of second point"<<endl;
+ cin>>x1>>yb;
+ glutInit(&argc,argv); //initalize GLUT library(graphics library utility
+toolkit)
+ glutInitDisplayMode(GLUT_SINGLE|GLUT_RGB); //set the initial display
+mode
+ glutInitWindowPosition(0,0); //set initial window position
+ glutInitWindowSize(640,480); //set initial window size
+ glutCreateWindow("Plot1"); //creates window with title "plot"
+ glClearColor(1.0,1.0,1.0,0);//set clear color to white
+ glColor3f(0.0,0.0,0.0); //set field color to black
+ gluOrtho2D(0,640,0,480);
+ glutDisplayFunc(DDA);
+ glutMainLoop(); //keep displaying until the program is closed
+ return 0;
+}
