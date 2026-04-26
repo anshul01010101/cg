@@ -1,0 +1,157 @@
+#include <iostream>
+#include
+<GL/glut.h> using
+namespace std;
+
+int xmin, ymin, xmax, ymax;
+int v;
+
+float Input[2][20]; float
+Output[2][20]; float
+Original[2][20];
+
+int k = 0;
+
+void copyOutputToInput()
+{ for(int i = 0; i <
+2; i++) for(int j
+= 0; j < k; j++)
+ Input[i][j] = Output[i][j];
+
+ v = k;
+}
+
+void left_clip(float xa, float ya, float xb, float yb)
+{ float m = (yb -
+ya) / (xb - xa);
+
+ if (xa >= xmin && xb >= xmin)
+ {
+ Output[0][k] = xb;
+Output[1][k] = yb; k++;
+ }
+ else if (xa >= xmin && xb < xmin)
+ {
+ Output[0][k] = xmin;
+ Output[1][k] = ya + m *
+(xmin - xa); k++;
+ }
+ else if (xa < xmin && xb >= xmin)
+ {
+ Output[0][k] = xmin;
+ Output[1][k] = ya + m * (xmin - xa);
+
+ Output[0][k + 1] = xb;
+ Output[1][k + 1] = yb;
+
+ k += 2;
+ }
+}
+
+void right_clip(float xa, float ya, float xb, float yb)
+{ float m = (yb -
+ya) / (xb - xa);
+
+ if (xa <= xmax && xb <= xmax)
+ {
+ Output[0][k] = xb;
+Output[1][k] = yb; k++;
+ }
+ else if (xa <= xmax && xb > xmax)
+ {
+ Output[0][k] = xmax;
+ Output[1][k] = ya + m *
+(xmax - xa); k++;
+ }
+ else if (xa > xmax && xb <= xmax)
+ {
+ Output[0][k] = xmax;
+ Output[1][k] = ya + m * (xmax - xa);
+
+ Output[0][k + 1] = xb;
+ Output[1][k + 1] = yb;
+
+ k += 2;
+ }
+}
+
+void display()
+{
+ glClear(GL_COLOR_BUFFER_BIT);
+
+ // Draw Clipping Window
+glColor3f(0, 0, 0);
+glBegin(GL_LINE_LOOP);
+glVertex2i(xmin, ymin);
+glVertex2i(xmax, ymin);
+glVertex2i(xmax, ymax);
+glVertex2i(xmin, ymax);
+glEnd();
+
+ // Draw Original Polygon
+(Blue) glColor3f(0, 0, 1);
+glBegin(GL_LINE_LOOP);
+ for(int i = 0; i < v; i++)
+glVertex2f(Original[0][i],
+Original[1][i]); glEnd(); // Draw
+Clipped Polygon (Red) glColor3f(1, 0,
+0); glBegin(GL_LINE_LOOP);
+ for(int i = 0; i < v; i++)
+glVertex2f(Input[0][i], Input[1][i]);
+glEnd();
+
+ glFlush();
+}
+
+int main(int argc, char** argv)
+{ cout << "Enter number of vertices:
+"; cin >> v;
+
+ cout << "Enter xmin
+ymin: "; cin >> xmin
+>> ymin;
+
+ cout << "Enter xmax
+ymax: "; cin >> xmax
+>> ymax;
+
+ for(int i = 0; i <
+v; i++) {
+cout << "Enter x y: ";
+cin >> Input[0][i] >>
+Input[1][i];
+
+ Original[0][i] = Input[0][i];
+ Original[1][i] = Input[1][i];
+ }
+
+ // LEFT CLIP k = 0; for(int i
+= 0; i < v; i++)
+left_clip(Input[0][i],
+Input[1][i],
+ Input[0][(i+1)%v], Input[1][(i+1)%v]);
+
+ copyOutputToInput();
+
+ // RIGHT CLIP
+k = 0; for(int i
+= 0; i < v; i++)
+right_clip(Input[0][i]
+, Input[1][i],
+ Input[0][(i+1)%v], Input[1][(i+1)%v]);
+
+ copyOutputToInput();
+
+ glutInit(&argc, argv);
+ glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
+glutInitWindowSize(640, 480);
+glutCreateWindow("Polygon
+Clipping");
+
+ glClearColor(1, 1, 1, 0);
+gluOrtho2D(0, 640, 0, 480);
+glutDisplayFunc(display);
+glutMainLoop();
+
+ return 0;
+}
