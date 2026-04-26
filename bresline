@@ -1,0 +1,176 @@
+#include <iostream>
+#include <GL/glut.h>
+
+using namespace std;
+
+int xa, ya, xb, yb;
+
+int Round(float a)
+{
+ return (int)(a+0.5);
+}
+
+void ddaline(int xi,int yi,int xf,int yf)
+{
+
+
+ int
+dx,dy,steps;
+dx = xf -
+xi; dy =
+yf - yi;
+
+ if(abs(dx) > abs(dy))
+ {
+ steps = abs(dx);
+ }
+else
+ {
+ steps = abs(dy);
+ }
+
+ float xinc,yinc;
+
+ xinc =
+float(dx)/steps;
+yinc =
+float(dy)/steps;
+ float x
+= xi, y = yi;
+glBegin(GL_PO
+INTS);
+
+ glVertex2d(xi,yi);
+
+ for(int i =0; i<steps; i++)
+ {
+x = x + xinc;
+
+y = y + yinc; glVertex2d(Round(x), Round(y));
+ }
+ glEnd();
+
+}
+
+void Draw()
+ {
+
+ glClear(GL_COLOR_BUFFER_BIT);
+glBegin(GL_POINTS); int dx, dy, d, f;
+int c, r; dx = xb - xa; dy
+= yb - ya;
+
+
+ if(abs(dx) > abs(dy)) // gentle slope
+ { d = 2 * abs(dy) - abs(dx);
+
+ if(dx > 0) // to decide the starting point
+ { c
+= xa; r
+= ya; f
+= xb;
+ }
+else
+{
+c = xb;
+r = yb;
+f = xa;
+ }
+
+ glVertex2d( c, r);
+
+ while(f >= c)
+ { if(d < 0)
+{ c = c
++ 1; d =
+d + 2 * abs(dy);
+ } else
+ { c = c+ 1; if(dx > 0 && dy >
+0 || dx < 0 && dy < 0)
+ {
+r = r + 1;
+}
+else
+{
+r = r - 1;
+ }
+
+ d = d + 2 *abs(dy) - 2 * abs(dx);
+ }
+
+ glVertex2d( c, r);
+
+ }
+ }
+ else // steep slope
+{ d = 2 * abs(dy) - abs(dx);
+
+if(dy >
+0) {
+c = ya;
+r = xa;
+f = yb;
+ } else
+ { c
+= yb; r
+= xb; f
+= ya;
+ }
+
+ glVertex2d(r,
+c); while(f
+>= c)
+ {
+if(d < 0)
+ { c
+= c + 1; d =
+d + 2 * abs(dx);
+ }
+else
+{ c
+= c + 1;
+
+ if(dx > 0 && dy > 0 || dx < 0
+&& dy < 0) r = r + 1;
+else r = r - 1;
+
+d = d + 2 * abs(dx) - 2 * abs(dy);
+ }
+
+ glVertex2d(r, c);
+ }
+}
+
+ glEnd();
+glFlush();
+}
+
+int main(int args,char ** argv)
+{
+ cout<<"\n Enter the First point:";
+cin>>xa>>ya; cout<<"\n Enter the
+Last point:"; cin>>xb>>yb;
+
+ glutInit(&args , argv); // initialize GLUT(Graphics Library
+Utility Tool) library
+
+ glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB); // set the
+initial display mode
+
+ glutInitWindowPosition(0,0);
+
+ glutInitWindowSize(640,480); // set the initial window position
+and size glutCreateWindow("DDAProgram");
+
+ glClearColor(1.0,1.0,1.0,0); //set clear color to white
+
+ glColor3f(0.0,0.0,0.0); // set clear color to black
+
+ gluOrtho2D(0,640,0,480);
+
+ glutDisplayFunc(Draw); // Call the displaying function
+
+ glutMainLoop(); // keep displaying until the program is closed
+
+ return 0;
+}
