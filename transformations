@@ -1,0 +1,284 @@
+#include<iostream>
+#include<GL/glut.h> using
+namespace std;
+
+int v; float
+Input[3][10];
+int tx, ty;
+float
+Output[3][10];
+float t[3][3];
+float s[3][3];
+float r[3][3];
+float sx, sy;
+int xr, yr;
+float costheta,
+sintheta; float
+cosr, sinr;
+
+int Round(float a)
+{ return (int)(a +
+0.5);
+}
+
+// FIXED DDA LINE FUNCTION
+void DdaLine(int xi, int yi, int xf, int yf)
+{ int
+steps;
+int dx = xf
+- xi;
+int dy = yf
+- yi;
+
+ if (abs(dx) >
+abs(dy)) steps
+= abs(dx); else
+steps = abs(dy);
+
+ float xinc =
+float(dx) / steps;
+float yinc = float(dy) /
+steps;
+
+ float x = xi, y = yi;
+
+ glBegin(GL_POINTS);
+
+ glVertex2d(Round(x) + 320, Round(y) + 240);
+
+ for (int i = 0; i < steps; i++)
+ { x = x + xinc; y = y + yinc;
+glVertex2d(Round(x) + 320, Round(y) + 240);
+ }
+
+ glEnd();
+}
+
+void mul(float Input[3][10], float s[3][3], float Output[3][10]) {
+for (int i = 0; i < 3; i++)
+ { for (int
+j = 0; j < v; j++)
+ {
+
+Output[i][j] = 0;
+for (int k = 0; k < 3;
+k++)
+ {
+ Output[i][j] += s[i][k] *
+Input[k][j];
+ }
+ }
+ }
+}
+
+void Draw()
+{
+ glClear(GL_COLOR_BUFFER_BIT);
+
+ glColor3f(1, 0, 0);
+ DdaLine(-320, 0, 320, 0);
+DdaLine(0, -240, 0, 240);
+
+ // Original polygon
+(RED) for (int i =
+0; i < v; i++)
+ {
+ DdaLine(Input[0][i], Input[1][i],
+ Input[0][(i + 1) % v], Input[1][(i +
+1) % v]);
+ }
+
+ // Transformed polygon (BLUE)
+ glColor3f(0,
+0, 1); for
+(int i = 0; i <
+v; i++)
+ {
+ DdaLine(Output[0][i], Output[1][i],
+ Output[0][(i + 1) % v], Output[1][(i
++ 1) % v]);
+ }
+
+ glFlush();
+}
+
+int main(int args, char **argv)
+{ int
+xfix, yfix;
+float cos,
+sin;
+
+ cout << "enter
+vertices:"; cin >>
+v;
+
+ int choice;
+
+ for (int i =
+0; i < v; i++)
+{ cout <<
+"x value:";
+cin >>
+Input[0][i];
+
+ cout << "y
+value:"; cin
+>> Input[1][i];
+
+ Input[2][i] = 1;
+ }
+
+ cout <<
+"1.Translation\n2.Scaling\n3.Rotation\n4.Shear\nenter
+choice:"; cin >> choice;
+
+ for (int i = 0;
+i < 3; i++) {
+for (int j = 0; j <
+v; j++)
+ { cout << Input[i][j]
+<< "\t";
+ } cout
+<< "\n";
+ } cout <<
+"\n";
+
+ switch (choice)
+ {
+case 1:
+cout << "enter
+tx,ty:";
+cin >> tx >> ty;
+
+ for (int i = 0; i < 3; i++)
+ { for (int j = 0; j <
+3; j++)
+ {
+if (i == j)
+t[i][j] = 1;
+else
+t[i][j]
+= 0;
+ }
+ }
+
+t[0][2] = tx;
+t[1][2] = ty;
+break;
+
+ case 2:
+ cout << "enter
+sx,sy:"; cin >>
+tx >> ty;
+
+ cout << "enter
+xfix,yfix: "; cin
+>> xfix >> yfix;
+
+ for (int i = 0; i < 3; i++)
+ { for (int j = 0; j <
+3; j++)
+ {
+if (i == j)
+t[i][j] = 1;
+else
+t[i][j]
+= 0;
+ }
+ }
+t[0][0] = tx;
+t[1][1] = ty;
+t[0][2] = xfix *
+(1 - tx);
+t[1][2] = yfix *
+(1 - ty);
+break;
+
+ case 3:
+cout << "enter costheta and sintheta
+values:"; cin
+>> costheta >> sintheta;
+
+ cout << "enter
+xr,yr:"; cin >>
+xr >> yr;
+
+ cosr = (costheta *
+3.14) / 180; sinr =
+(sintheta * 3.14) / 360;
+
+ for (int i = 0; i < 3; i++)
+ { for (int j = 0; j <
+3; j++)
+ { if (i
+== j) t[i][j]
+= cosr;
+else
+t[i][j] =
+sinr;
+}
+ }
+
+ t[0][1] = -sinr; t[0][2] = xr *
+(1 - cosr) + yr * sinr;
+t[1][2] = yr * (1 - cosr)
+- xr * sinr;
+t[2][0] = 0;
+t[2][1] = 0;
+t[2][2] = 1;
+break;
+
+ case 4:
+ {
+float shx, shy; cout << "Enter
+shear factors shx and shy: ";
+cin >> shx >> shy;
+
+ for (int i = 0; i < 3; i++)
+ { for (int j = 0; j <
+3; j++)
+ {
+if (i == j)
+t[i][j] = 1;
+else
+t[i][j]
+= 0;
+ }
+ }
+
+t[0][1] = shx;
+t[1][0] = shy;
+break;
+ }
+
+ default: cout <<
+"invalid choice";
+ }
+
+ mul(Input, t, Output);
+
+ cout <<
+"Output\n";
+for (int i = 0; i
+< 3; i++) {
+for (int j = 0; j
+< v; j++) {
+cout <<
+Output[i][j] << "\t";
+ } cout
+<< "\n";
+ }
+
+ glutInit(&args, argv);
+ glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
+glutInitWindowSize(640, 480);
+glutCreateWindow("Polygon Transformation");
+
+ glClearColor(1, 1, 1, 0);
+gluOrtho2D(0, 640, 0, 480);
+
+ glutDisplayFunc(Draw);
+glutMainLoop();
+
+ return 0;
+} 
